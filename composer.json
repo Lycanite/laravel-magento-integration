@@ -12,21 +12,15 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*"
+        "illuminate/support": "5.*"
     },
     "autoload": {
         "classmap": [
-            "src/migrations",
             "src/Tinyrocket/Magento/Connections/Exceptions.php",
             "src/Tinyrocket/Magento/Objects/Exceptions.php"
         ],
         "psr-0": {
             "Tinyrocket\\Magento\\": "src/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
         }
     }
 }
