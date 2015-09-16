@@ -50,8 +50,15 @@ class MagentoServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('tinyrocket/magento');
+		//$this->package('tinyrocket/magento');
 
+		$this->publishes([
+				__DIR__ . '/../../config/tinyrocket-magento.php' => config_path('tinyrocket-magento.php'),
+		]);
+
+		$this->mergeConfigFrom(
+				__DIR__ . '/../../config/tinyrocket-magento.php', 'tinyrocket-magento'
+		);
 	}
 
 	/**

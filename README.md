@@ -14,10 +14,9 @@ To install via composer, add the following to your requirements
 
     "require": {
 		...
-		"tinyrocket/magento": "1.0.*"
+		"tinyrocket/magento": "dev-master"
 		...
 	},
-**Note:** You may need to change your **minimum-stability** to **dev**
 
 ### Configuration
 
@@ -28,7 +27,7 @@ To your **providers** array
 
     'providers' => array(
         ...
-		'Tinyrocket\Magento\MagentoServiceProvider',
+		Tinyrocket\Magento\MagentoServiceProvider::class,
 		...
 	),
 	
@@ -37,14 +36,14 @@ and to your **aliases** array
 
 	'aliases' => array(
 	    ...
-		'Magento' => 'Tinyrocket\Magento\Facades\Magento',
+		'Magento' => Tinyrocket\Magento\Facades\Magento::class,
 		...
 	),
 	
 Publish the the package configuration file by running the following in CLI
 
-    php artisan config:publish tinyrocket/magento
-    
+    php artisan vendor:publish
+
 #### Setting up the SOAP connections
 
 The quickest way to get started with Magento integration is to add your connection(s) to the newly published configuration file. The file can be found in
