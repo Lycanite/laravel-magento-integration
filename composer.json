@@ -1,13 +1,17 @@
 {
     "name": "tinyrocket/magento",
     "description": "A simple Magento Integration using SOAP v1 and v2",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": ["laravel", "magento", "soap"],
     "license": "MIT",
     "authors": [
         {
             "name": "Michael Kyle Martin",
             "email": "michael@tinyrocket.co"
+        },
+        {
+            "name": "Richard Nicholson",
+            "email": "rjnicholson1591@gmail.com"
         }
     ],
     "require": {

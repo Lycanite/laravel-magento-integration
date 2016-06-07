@@ -11,19 +11,19 @@ use Tinyrocket\Magento\Objects\MagentoObject;
  * 	Magento API | Connection Exceptions
  *
  *	The MIT License (MIT)
- *	
+ *
  *	Copyright (c) 2014 TinyRocket
- *	
+ *
  *	Permission is hereby granted, free of charge, to any person obtaining a copy
  *	of this software and associated documentation files (the "Software"), to deal
  *	in the Software without restriction, including without limitation the rights
  *	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *	copies of the Software, and to permit persons to whom the Software is
  *	furnished to do so, subject to the following conditions:
- *	
+ *
  *	The above copyright notice and this permission notice shall be included in
  *	all copies or substantial portions of the Software.
- *	
+ *
  *	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -79,30 +79,33 @@ class MagentoSoapClient extends \SoapClient {
 
 				parent::__construct($this->wsdl, $options);
 
-				$this->session = $this->login($this->connection['user'], $this->connection['key']);			
+				$this->session = $this->login($this->connection['user'], $this->connection['key']);
 			} catch (Exception $e) {
 				throw new MagentoSoapClientException($e->getMessage());
 			}
-			
+
 		}
 
 	}
 
 	/**
 	 *	Capture and format SOAP calls for both
-	 *	v1 and v2 of the Magento api. 
+	 *	v1 and v2 of the Magento api.
 	 */
-	 public function __call($method, $args) 
+	 public function __call($method, $args)
 	 {
 	 	if ( is_array($args) && count($args) == 1 ) {
 	 		$args = current($args);
 	 	}
 
 	 	try {
-	 		if ( $method == 'login' ) {
+			if ( $method == 'login' ) {
 			    $this->results = $this->__soapCall($method, $args);
 			} elseif ($method == 'call') {
 				$this->results = $this->__soapCall($method, $args);
+			} elseif (is_array($args)) {
+					array_unshift($args, $this->session);
+					$this->results = $this->__soapCall($method, $args);
 			} else {
 				$this->results = $this->__soapCall($method, array($this->session, $args));
 			}
@@ -156,7 +159,7 @@ class MagentoSoapClient extends \SoapClient {
 	 *	Get Functions
 	 *
 	 *	Extension of the __getFunctions method core to SoapClient
-	 *	
+	 *
 	 *	@return array
 	 */
 	public function getFunctions()
@@ -168,7 +171,7 @@ class MagentoSoapClient extends \SoapClient {
 	 *	Get Last Response
 	 *
 	 *	Extension of the __getLastResponse method core to SoapClient
-	 *	
+	 *
 	 *	@return array
 	 */
 	public function getLastResponse()
@@ -179,13 +182,13 @@ class MagentoSoapClient extends \SoapClient {
 	/**
 	 *	Get Soap Version
 	 *
-	 *	Returns the selected version of the SOAP API	
+	 *	Returns the selected version of the SOAP API
 	 *
 	 *	@return string
 	 */
 	public function getSoapVersion()
 	{
-			
+
 		$version = isset($this->connection['version']) ? $this->connection['version'] : '';
 
 		if ( isset($this->connection['version']) && in_array(strtolower($this->connection['version']), $this->getAvailableVersions()) ) {
@@ -262,7 +265,7 @@ class MagentoSoapClient extends \SoapClient {
 	 *	connection or the connection passed through to the function
 	 *
 	 *	@return string
-	 *	@example 
+	 *	@example
 	 */
 	public function getMagentoVersion()
 	{
@@ -271,7 +274,7 @@ class MagentoSoapClient extends \SoapClient {
 			case 'v1':
 				$response = $this->call('core_magento.info', array());
 				break;
-			
+
 			case 'v2':
 				$response = $this->__call('magentoInfo', array());
 				break;
@@ -304,7 +307,7 @@ class MagentoSoapClient extends \SoapClient {
 			case 'v2':
 				return sprintf("%s/api/v2_soap?wsdl", $url);
 				break;
-			
+
 			default:
 				return sprintf("%s/api/v2_soap?wsdl", $url);
 				break;
