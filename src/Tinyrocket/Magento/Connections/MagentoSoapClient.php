@@ -70,10 +70,14 @@ class MagentoSoapClient extends \SoapClient {
 	 *
 	 *	@return void
 	 */
-	public function __construct($connection = null, $options = array('trace' => 1))
+	public function __construct($connection = null, $options = ['trace' => 1, 
+																'soap_version' => 'SOAP_1_2', 
+																'cache_wsdl' => WSDL_CACHE_BOTH, 
+																'keep_alive' => 0])
 	{
 		if ( !is_null($connection) ) {
 			try {
+				
 				$this->connection = $connection[key($connection)];
 				$this->wsdl = $this->getConstructedUrl();
 
@@ -81,6 +85,7 @@ class MagentoSoapClient extends \SoapClient {
 
 				$this->session = $this->login($this->connection['user'], $this->connection['key']);
 			} catch (Exception $e) {
+				\Log::info($e);
 				throw new MagentoSoapClientException($e->getMessage());
 			}
 
@@ -316,6 +321,6 @@ class MagentoSoapClient extends \SoapClient {
 
 	public function __destruct()
 	{
-
+		
 	}
 }

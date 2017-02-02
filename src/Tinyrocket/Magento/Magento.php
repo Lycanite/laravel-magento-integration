@@ -58,7 +58,7 @@ class Magento {
 	 *	@var forgets
 	 */
 	protected $forgets;
-	
+
 	public function returnClient(){
 		return $this->client;
 	}
@@ -281,6 +281,7 @@ class Magento {
 			$connection = is_array($connection) ? $connection : $this->getConnection($connection);
 			\MagentoSoapStorage::add($connection);
 
+			$forget = true;
 			if ( true === $forget ) {
 				$this->forgets[] = key($connection);
 			}
