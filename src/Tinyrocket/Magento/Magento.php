@@ -59,7 +59,8 @@ class Magento {
 	 */
 	protected $forgets;
 
-	public function returnClient(){
+	public function returnClient()
+	{
 		return $this->client;
 	}
 

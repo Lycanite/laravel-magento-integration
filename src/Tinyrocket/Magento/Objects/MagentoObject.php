@@ -6,19 +6,19 @@ use Tinyrocket\Magento\Objects\MagentoObjectException;
  * 	Magento API | Connection Exceptions
  *
  *	The MIT License (MIT)
- *	
+ *
  *	Copyright (c) 2014 TinyRocket
- *	
+ *
  *	Permission is hereby granted, free of charge, to any person obtaining a copy
  *	of this software and associated documentation files (the "Software"), to deal
  *	in the Software without restriction, including without limitation the rights
  *	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *	copies of the Software, and to permit persons to whom the Software is
  *	furnished to do so, subject to the following conditions:
- *	
+ *
  *	The above copyright notice and this permission notice shall be included in
  *	all copies or substantial portions of the Software.
- *	
+ *
  *	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -58,11 +58,11 @@ class MagentoObject {
 			$args[0] = array();
         }
         $this->data = (array)$args[0];
-	} 
+	}
 
      /**
       * Retrieves data from the object
-      * 
+      *
       * @see Varien_Object
       * @return mixed
       */
@@ -80,6 +80,31 @@ class MagentoObject {
 
         throw new MagentoObjectException("Key [$key] not found for this item");
      }
+
+      /**
+       * Returns true if there is data for the provided key.
+       *
+       * @see Varien_Object
+       * @return mixed
+       */
+      public function hasData($key = null)
+      {
+         // Return everything
+         if (is_null($key)) {
+			 if(is_array($this->data))
+             	return count($this->data) > 0;
+			return !is_null($this->data);
+         }
+
+         // Return key
+         if (isset($this->data[$key])) {
+			 if(is_array($this->data[$key]))
+             	return count($this->data[$key]) > 0;
+             return !is_null($this->data[$key]);
+         };
+
+         throw new MagentoObjectException("Key [$key] not found for checknig data");
+      }
 
      /**
       * Get Item Id

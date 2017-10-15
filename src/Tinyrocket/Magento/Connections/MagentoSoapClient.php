@@ -61,6 +61,11 @@ class MagentoSoapClient extends \SoapClient {
 	protected $results;
 
 	/**
+	 *	@var rawResponse
+	 */
+	protected $rawResponse;
+
+	/**
 	 *	@var debugTrace
 	 */
 	protected $debugTrace;
@@ -70,14 +75,19 @@ class MagentoSoapClient extends \SoapClient {
 	 *
 	 *	@return void
 	 */
-	public function __construct($connection = null, $options = ['trace' => 1, 
-																'soap_version' => 'SOAP_1_2', 
-																'cache_wsdl' => WSDL_CACHE_BOTH, 
-																'keep_alive' => 0])
+	public function __construct($connection = null, $options = [
+		'connection_timeout' => 600000,
+		'soap_version' => 'SOAP_1_2',
+		'cache_wsdl' => WSDL_CACHE_BOTH,
+		'exceptions' => true,
+		'trace' => true,
+		'encoding' => 'UTF-8',
+		'keep_alive' => 0
+	])
 	{
 		if ( !is_null($connection) ) {
 			try {
-				
+
 				$this->connection = $connection[key($connection)];
 				$this->wsdl = $this->getConstructedUrl();
 
@@ -117,6 +127,7 @@ class MagentoSoapClient extends \SoapClient {
 
 			return $this->getResultsCollections();
 		} catch ( \Exception $e) {
+			throw $e;
 	 		throw new MagentoSoapClientException($e->getMessage());
 	 	}
 	 }
@@ -127,6 +138,7 @@ class MagentoSoapClient extends \SoapClient {
 	 		$data = array_merge(array($this->session, $method), array($params));
 	 		return parent::call($data);
 	 	} catch (Exception $e) {
+			throw $e;
 	 		throw new MagentoSoapClientException($e->getMessage());
 	 	}
 	 }
@@ -182,6 +194,18 @@ class MagentoSoapClient extends \SoapClient {
 	public function getLastResponse()
 	{
 		return $this->__getLastResponse();
+	}
+
+	/**
+	 *	Get Last Raw Response
+	 *
+	 *	Returns the last raw response received.
+	 *
+	 *	@return array
+	 */
+	public function getLastRawResponse()
+	{
+		return $this->rawResponse;
 	}
 
 	/**
@@ -321,6 +345,22 @@ class MagentoSoapClient extends \SoapClient {
 
 	public function __destruct()
 	{
-		
+
+	}
+
+	// Override Do Request to deal with "Looks like we got no XML" errors from special characters.
+	public function __doRequest($request, $location, $action, $version, $one_way = 0)
+	{
+		$response = parent::__doRequest($request, $location, $action, $version, $one_way);
+		$this->rawResponse = $response;
+		//if resposnse content type is mtom strip away everything but the xml.
+		if (strpos($response, "Content-Type: application/xop+xml") !== false) {
+			//not using stristr function twice because not supported in php 5.2 as shown below
+			//$response = stristr(stristr($response, "<s:"), "</s:Envelope>", true) . "</s:Envelope>";
+			$tempstr = stristr($response, "<s:");
+			$response = substr($tempstr, 0, strpos($tempstr, "</s:Envelope>")) . "</s:Envelope>";
+		}
+		//log_message($response);
+		return $response;
 	}
 }
