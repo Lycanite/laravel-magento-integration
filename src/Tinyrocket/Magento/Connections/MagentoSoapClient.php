@@ -7,6 +7,8 @@ use Tinyrocket\Magento\Connections\MagentoSoapConfigurationException;
 use Tinyrocket\Magento\Objects\MagentoObjectCollection;
 use Tinyrocket\Magento\Objects\MagentoObject;
 
+use Devilwear\HiveLog\HiveLog;
+
 /**
  * 	Magento API | Connection Exceptions
  *
@@ -87,7 +89,7 @@ class MagentoSoapClient extends \SoapClient {
 	{
 		if ( !is_null($connection) ) {
 			try {
-
+			
 				$this->connection = $connection[key($connection)];
 				$this->wsdl = $this->getConstructedUrl();
 
@@ -109,19 +111,33 @@ class MagentoSoapClient extends \SoapClient {
 	 */
 	 public function __call($method, $args)
 	 {
+		$log = new HiveLog();
+		$log->object_id = 11110000;
+	 	$log->object_type = 'magento_soap_call';
+	 	$log->event = $method;
+	 	$log->log = is_array($args) ? json_encode($args) : $args;
+	 	$log->save();
+		
 	 	if ( is_array($args) && count($args) == 1 ) {
 	 		$args = current($args);
 	 	}
-
 	 	try {
+		 	
 			if ( $method == 'login' ) {
-			    $this->results = $this->__soapCall($method, $args);
+			    $this->results = \Cache::remember('magento1login-'.sha1(json_encode($args)), 10, function() use ($method,$args) {
+				    return $this->__soapCall($method, $args);
+				});
 			} elseif ($method == 'call') {
+				
 				$this->results = $this->__soapCall($method, $args);
+				    
 			} elseif (is_array($args)) {
-					array_unshift($args, $this->session);
-					$this->results = $this->__soapCall($method, $args);
+				
+				array_unshift($args, $this->session);	
+				$this->results = $this->__soapCall($method, $args);
+				
 			} else {
+				
 				$this->results = $this->__soapCall($method, array($this->session, $args));
 			}
 
@@ -134,6 +150,15 @@ class MagentoSoapClient extends \SoapClient {
 
 	 public function call($method, $params)
 	 {
+		$log = new HiveLog();
+	 	//HiveLog::create(['object_id' => 1111,'object_type'=>'magento_soap_call','event' => $method,'log' => json_encode($args)]);
+
+	 	$log->object_id = 222200000;
+	 	$log->object_type = 'magento_soap_call';
+	 	$log->event = $method;
+	 	$log->log = is_array($params) ? json_encode($params) : $params;
+	 	$log->save();
+
 	 	try {
 	 		$data = array_merge(array($this->session, $method), array($params));
 	 		return parent::call($data);
